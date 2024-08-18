@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Rules for Projects" Description="Code analysis rules for main projects." ToolsVersion="15.0">
+  <!-- Docs: https://docs.microsoft.com/en-us/visualstudio/code-quality/rule-set-reference -->
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA2007" Action="None"/>
+    <!-- Do not directly await a Task -->
+  </Rules>
+  <!-- Docs: https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/DOCUMENTATION.md -->
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <Rule Id="SA1512" Action="None" />
+    <!-- Single-line comments must not be followed by blank line -->
+    <Rule Id="SA1005" Action="None" />
+    <!-- Single line comments should begin with single space -->
+    <Rule Id="SA1108" Action="None" />
+    <!-- Block statements should not contain embedded comments -->
+  </Rules>
+</RuleSet>

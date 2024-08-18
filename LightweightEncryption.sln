@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35125.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LightweightEncryption", "src\LightweightEncryption.csproj", "{505166A7-DDD3-42B8-AC83-0506E35A9092}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A4D3A04B-469D-4B60-92D3-BB2F960E29B4}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		projects.ruleset = projects.ruleset
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{505166A7-DDD3-42B8-AC83-0506E35A9092}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{505166A7-DDD3-42B8-AC83-0506E35A9092}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{505166A7-DDD3-42B8-AC83-0506E35A9092}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{505166A7-DDD3-42B8-AC83-0506E35A9092}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D1842AD8-E007-4C34-8CE4-96C4652FAB18}
+	EndGlobalSection
+EndGlobal

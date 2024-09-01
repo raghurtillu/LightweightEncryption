@@ -1,4 +1,7 @@
-﻿// This is free and unencumbered software released into the public domain.
+﻿// <copyright file="KeyVaultSecretClient.cs" owner="Raghu R">
+// Copyright (c) Raghu R. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
 using Azure.Core;
 using Azure.Security.KeyVault.Secrets;
@@ -35,7 +38,7 @@ namespace LightweightEncryption.KeyVault
         public async Task<string> GetSecretAsync(string name, CancellationToken cancellationToken)
         {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            // Get secret with latest version
+            // Get latest secret version
             return await this.GetSecretAsync(name, version: null, cancellationToken);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }

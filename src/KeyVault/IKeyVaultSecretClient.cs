@@ -1,4 +1,7 @@
-﻿// This is free and unencumbered software released into the public domain.
+﻿// <copyright file="IKeyVaultSecretClient.cs" owner="Raghu R">
+// Copyright (c) Raghu R. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
 using System;
 
@@ -15,7 +18,7 @@ namespace LightweightEncryption.KeyVault
         public string GetKeyVaultName();
 
         /// <summary>
-        /// Gets the secret from the Key Vault.
+        /// Gets the latest secret version from the Key Vault.
         /// </summary>
         /// <param name="name">Secret name.</param>
         /// <param name="cancellationToken">CancellationToken.</param>
@@ -23,7 +26,7 @@ namespace LightweightEncryption.KeyVault
         public Task<string> GetSecretAsync(string name, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets the secret from the Key Vault.
+        /// Gets the specified secret version from the Key Vault.
         /// </summary>
         /// <param name="name">Secret name.</param>
         /// <param name="version">Secret version.</param>

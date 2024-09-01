@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		projects.ruleset = projects.ruleset
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightweightEncryption.Tests", "tests\LightweightEncryption.Tests\LightweightEncryption.Tests.csproj", "{F247E61D-1D0B-4AA6-9587-F1CB6839DD6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{505166A7-DDD3-42B8-AC83-0506E35A9092}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{505166A7-DDD3-42B8-AC83-0506E35A9092}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{505166A7-DDD3-42B8-AC83-0506E35A9092}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F247E61D-1D0B-4AA6-9587-F1CB6839DD6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F247E61D-1D0B-4AA6-9587-F1CB6839DD6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F247E61D-1D0B-4AA6-9587-F1CB6839DD6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F247E61D-1D0B-4AA6-9587-F1CB6839DD6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

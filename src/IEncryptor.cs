@@ -1,4 +1,7 @@
-﻿// This is free and unencumbered software released into the public domain.
+﻿// <copyright file="IEncryptor.cs" owner="Raghu R">
+// Copyright (c) Raghu R. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
 namespace LightweightEncryption
 {

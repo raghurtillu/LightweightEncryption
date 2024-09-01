@@ -1,4 +1,7 @@
-﻿// This is free and unencumbered software released into the public domain.
+﻿// <copyright file="Encryptor.cs" owner="Raghu R">
+// Copyright (c) Raghu R. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
 using System;
 using System.Collections.Generic;
@@ -88,7 +91,7 @@ namespace LightweightEncryption
                 throw new InvalidOperationException($"Pseudo master key '{this.encryptionConfiguration.SecretName}' for version " +
                     $"'{this.encryptionConfiguration.SecretVersion}' in keyvault '{this.encryptionConfiguration.Keyvault}' not found or is empty.");
             }
-            
+
             var plainText = Utf8Encoder.GetBytes(input);
             return Encrypt(plainText, masterKey, new byte[HeaderSize + plainText.Length]);
 
@@ -96,7 +99,7 @@ namespace LightweightEncryption
             {
                 var buffer = encryptedData.Slice(0, HeaderSize);
                 var cipherText = encryptedData.Slice(HeaderSize);
-                
+
                 // Set the preamble.
                 Preamble.AsSpan().CopyTo(buffer.Slice(PreambleOffset, PreambleSizeInBytes));
 
@@ -118,7 +121,7 @@ namespace LightweightEncryption
                 // Encrypt the data using derivedKey.
                 var nonce = salt.Slice(0, NonceSizeInBytes);
                 var tag = buffer.Slice(TagOffset, TagSizeInBytes);
-                
+
                 using var encryptor = new AesGcm(derivedKey, TagSizeInBytes);
                 encryptor.Encrypt(nonce, plainText, cipherText, tag);
 
@@ -126,6 +129,7 @@ namespace LightweightEncryption
             }
         }
 
+        /// <inheritdoc />
         public async Task<string> DecryptAsync(string encrypted)
         {
             if (string.IsNullOrEmpty(encrypted))
@@ -160,7 +164,7 @@ namespace LightweightEncryption
                 var cipherText = encryptedData.Slice(HeaderSize);
                 using var encryptor = new AesGcm(derivedKey, TagSizeInBytes);
                 encryptor.Decrypt(nonce, cipherText, tag, decryptedData);
-                
+
                 return Utf8Encoder.GetString(decryptedData);
             }
         }

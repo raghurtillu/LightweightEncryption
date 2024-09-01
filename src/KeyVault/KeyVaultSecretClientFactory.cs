@@ -1,4 +1,7 @@
-﻿// This is free and unencumbered software released into the public domain.
+﻿// <copyright file="KeyVaultSecretClientFactory.cs" owner="Raghu R">
+// Copyright (c) Raghu R. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
 using System;
 using System.Globalization;
@@ -77,7 +80,7 @@ namespace LightweightEncryption.KeyVault
                     MaxRetries = this.keyVaultConfiguration.RequestMaxRetries,
                     Mode = RetryMode.Exponential,
                     NetworkTimeout = this.keyVaultConfiguration.RequestTimeout,
-                }
+                },
             };
 
             return new SecretClient(keyVaultUri, this.tokenCredential, secretClientOptions);

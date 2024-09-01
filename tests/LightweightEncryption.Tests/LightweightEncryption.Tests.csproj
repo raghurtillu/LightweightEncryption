@@ -7,6 +7,8 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>LightweightEncryption.Tests</AssemblyName>
+    <RootNamespace>LightweightEncryption.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

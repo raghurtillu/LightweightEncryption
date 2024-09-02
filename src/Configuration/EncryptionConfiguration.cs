@@ -10,13 +10,8 @@ namespace LightweightEncryption.Configuration
     /// <summary>
     /// Encryption configuration.
     /// </summary>
-    public class EncryptionConfiguration
+    public sealed class EncryptionConfiguration
     {
-        /// <summary>
-        /// Gets or sets the key vault.
-        /// </summary>
-        required public string Keyvault { get; set; }
-
         /// <summary>
         /// Gets or sets the pseudo symmetric key from which the encryption key is derived.
         /// </summary>

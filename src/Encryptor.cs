@@ -44,7 +44,7 @@ namespace LightweightEncryption
         private static readonly UTF8Encoding Utf8Encoder = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
         private readonly EncryptionConfiguration encryptionConfiguration;
-        private readonly IKeyVaultSecretClientFactory keyVaultSecretClientFactory;
+        private readonly IKeyVaultSecretClient keyVaultSecretClient;
         private readonly IMemoryCache memoryCache;
         private readonly TimeSpan cacheExpirationTimeInHours;
 
@@ -61,12 +61,12 @@ namespace LightweightEncryption
         {
             this.encryptionConfiguration = Guard.Argument(encryptionConfiguration, nameof(encryptionConfiguration))
                 .NotNull()
-                .Member(i => i.Keyvault, s => s.NotNull().NotEmpty())
                 .Member(i => i.SecretName, s => s.NotNull().NotEmpty())
                 .Member(i => i.SecretVersion, s => s.NotNull().NotEmpty())
                 .Value;
 
-            this.keyVaultSecretClientFactory = Guard.Argument(keyVaultSecretClientFactory, nameof(keyVaultSecretClientFactory)).NotNull().Value;
+            keyVaultSecretClientFactory = Guard.Argument(keyVaultSecretClientFactory, nameof(keyVaultSecretClientFactory)).NotNull().Value;
+            this.keyVaultSecretClient = keyVaultSecretClientFactory.GetKeyVaultSecretClient();
             this.memoryCache = Guard.Argument(memoryCache, nameof(memoryCache)).NotNull().Value;
             this.cacheExpirationTimeInHours = TimeSpan.FromHours(1);
         }
@@ -83,7 +83,7 @@ namespace LightweightEncryption
             if (masterKey == default || masterKey.Length == 0)
             {
                 throw new InvalidOperationException($"Pseudo master key '{this.encryptionConfiguration.SecretName}' for version " +
-                    $"'{this.encryptionConfiguration.SecretVersion}' in keyvault '{this.encryptionConfiguration.Keyvault}' not found or is empty.");
+                    $"'{this.encryptionConfiguration.SecretVersion}' in keyvault '{this.keyVaultSecretClient.GetKeyVaultName()}' not found or is empty.");
             }
 
             var plainText = Utf8Encoder.GetBytes(input);
@@ -175,11 +175,10 @@ namespace LightweightEncryption
                 async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = this.cacheExpirationTimeInHours;
-                    var keyVaultSecretClient = this.keyVaultSecretClientFactory.GetKeyVaultSecretClient(this.encryptionConfiguration.Keyvault);
 
                     var secret = !string.IsNullOrEmpty(masterKeyVersion)
-                                     ? await keyVaultSecretClient.GetSecretAsync(this.encryptionConfiguration.SecretName, masterKeyVersion, default)
-                                     : await keyVaultSecretClient.GetSecretAsync(this.encryptionConfiguration.SecretName, default);
+                                     ? await this.keyVaultSecretClient.GetSecretAsync(this.encryptionConfiguration.SecretName, masterKeyVersion, default)
+                                     : await this.keyVaultSecretClient.GetSecretAsync(this.encryptionConfiguration.SecretName, default);
                     return Convert.FromHexString(secret);
                 });
         }

@@ -15,8 +15,7 @@ namespace LightweightEncryption.KeyVault
         /// <summary>
         /// Get the Key Vault secret client.
         /// </summary>
-        /// <param name="keyVaultName">KeyVault name.</param>
         /// <returns>IKeyVaultSecretClient.</returns>
-        public IKeyVaultSecretClient GetKeyVaultSecretClient(string keyVaultName);
+        public IKeyVaultSecretClient GetKeyVaultSecretClient();
     }
 }

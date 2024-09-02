@@ -16,7 +16,7 @@ namespace LightweightEncryption.KeyVault
     /// <summary>
     /// Implementation of <seealso cref="IKeyVaultSecretClientFactory"/>.
     /// </summary>
-    internal sealed class KeyVaultSecretClientFactory : IKeyVaultSecretClientFactory
+    public sealed class KeyVaultSecretClientFactory : IKeyVaultSecretClientFactory
     {
         private readonly KeyVaultConfiguration keyVaultConfiguration;
         private readonly TokenCredential tokenCredential;
@@ -24,15 +24,15 @@ namespace LightweightEncryption.KeyVault
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyVaultSecretClientFactory"/> class.
         /// </summary>
-        /// <param name="configuration">KeyVaultConfiguration.</param>
+        /// <param name="keyvaultConfiguration">KeyVaultConfiguration.</param>
         /// <param name="tokenCredential">TokenCredential.</param>
-        public KeyVaultSecretClientFactory(IOptions<KeyVaultConfiguration> configuration, TokenCredential tokenCredential)
+        public KeyVaultSecretClientFactory(IOptions<KeyVaultConfiguration> keyvaultConfiguration, TokenCredential tokenCredential)
         {
-            Guard.Argument(configuration, nameof(configuration)).NotNull();
-            Guard.Argument(configuration.Value, nameof(configuration)).NotNull();
+            Guard.Argument(keyvaultConfiguration, nameof(keyvaultConfiguration)).NotNull();
+            Guard.Argument(keyvaultConfiguration.Value, nameof(keyvaultConfiguration)).NotNull();
             Guard.Argument(tokenCredential, nameof(tokenCredential)).NotNull();
 
-            this.keyVaultConfiguration = configuration.Value;
+            this.keyVaultConfiguration = keyvaultConfiguration.Value;
             this.tokenCredential = tokenCredential;
 
             if (!this.keyVaultConfiguration.Validate())
@@ -42,12 +42,9 @@ namespace LightweightEncryption.KeyVault
         }
 
         /// <inheritdoc/>
-        public IKeyVaultSecretClient GetKeyVaultSecretClient(string keyVaultName)
+        public IKeyVaultSecretClient GetKeyVaultSecretClient()
         {
-            if (string.IsNullOrWhiteSpace(keyVaultName))
-            {
-                keyVaultName = this.keyVaultConfiguration.DefaultKeyVaultName;
-            }
+            var keyVaultName = this.keyVaultConfiguration.KeyVaultName;
 
             var keyVaultUri = this.GetKeyVaultUri(keyVaultName);
             var secretClient = this.GetSecretClient(keyVaultUri);
@@ -79,7 +76,7 @@ namespace LightweightEncryption.KeyVault
                     Delay = TimeSpan.FromSeconds(2),
                     MaxRetries = this.keyVaultConfiguration.RequestMaxRetries,
                     Mode = RetryMode.Exponential,
-                    NetworkTimeout = this.keyVaultConfiguration.RequestTimeout,
+                    NetworkTimeout = this.keyVaultConfiguration.RequestTimeoutInSeconds,
                 },
             };
 

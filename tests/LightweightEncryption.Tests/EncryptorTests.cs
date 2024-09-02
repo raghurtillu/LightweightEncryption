@@ -27,7 +27,7 @@ namespace LightweightEncryption.Tests
         {
             this.mockKeyVaultSecretClientFactory = new Mock<IKeyVaultSecretClientFactory>();
             this.mockKeyVaultSecretClient = new Mock<IKeyVaultSecretClient>();
-            this.mockKeyVaultSecretClientFactory.Setup(x => x.GetKeyVaultSecretClient(It.IsAny<string>()))
+            this.mockKeyVaultSecretClientFactory.Setup(x => x.GetKeyVaultSecretClient())
                 .Returns(this.mockKeyVaultSecretClient.Object).Verifiable();
         }
 
@@ -148,15 +148,18 @@ namespace LightweightEncryption.Tests
             this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        /// <summary>
+        /// Get encryption configuration.
+        /// </summary>
+        /// <param name="key">EncryptionKey.</param>
+        /// <returns>EncryptionConfiguration.</returns>
         private static EncryptionConfiguration GetEncryptionConfiguration(string key)
         {
             return new EncryptionConfiguration
             {
-                Keyvault = "keyvault",
                 SecretName = key,
                 SecretVersion = Guid.NewGuid().ToString("N"),
             };
-
         }
 
         /// <summary>

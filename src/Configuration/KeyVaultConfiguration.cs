@@ -12,17 +12,17 @@ namespace LightweightEncryption.Configuration
     /// <summary>
     /// Keyvault Configuration.
     /// </summary>
-    internal class KeyVaultConfiguration
+    public sealed class KeyVaultConfiguration
     {
         /// <summary>
         /// Gets or sets the default key vault name.
         /// </summary>
-        public string DefaultKeyVaultName { get; set; } = string.Empty;
+        required public string KeyVaultName { get; set; }
 
         /// <summary>
         /// Gets or sets the request timeout.
         /// </summary>
-        public TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(30);
+        public TimeSpan RequestTimeoutInSeconds { get; set; } = TimeSpan.FromSeconds(30);
 
         /// <summary>
         /// Gets or sets the request max retries.
@@ -32,7 +32,7 @@ namespace LightweightEncryption.Configuration
         /// <summary>
         /// Gets or sets the Key Vault URI.
         /// </summary>
-        public string KeyVaultUri { get; set; } = "https://{0}.vault.azure.net/";
+        required public string KeyVaultUri { get; set; }
 
         /// <summary>
         /// Validates the keyVaultConfiguration.
@@ -43,7 +43,7 @@ namespace LightweightEncryption.Configuration
             Guard.Argument(this, nameof(KeyVaultConfiguration))
                 .NotNull()
                 .Member(x => x.KeyVaultUri, v => v.NotNull().NotEmpty())
-                .Member(x => x.DefaultKeyVaultName, v => v.NotNull().NotEmpty());
+                .Member(x => x.KeyVaultName, v => v.NotNull().NotEmpty());
 
             return true;
         }

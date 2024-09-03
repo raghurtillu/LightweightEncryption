@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		projects.ruleset = projects.ruleset
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightweightEncryption.Tests", "tests\LightweightEncryption.Tests\LightweightEncryption.Tests.csproj", "{F247E61D-1D0B-4AA6-9587-F1CB6839DD6A}"

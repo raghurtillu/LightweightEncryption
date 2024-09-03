@@ -20,7 +20,7 @@ namespace LightweightEncryption.Configuration
         /// <summary>
         /// Gets or sets the pseudo symmetric key version.
         /// </summary>
-        required public string SecretVersion { get; set; }
+        required public string SecretVersionName { get; set; }
 
         /// <summary>
         /// Gets or sets the encryption type.

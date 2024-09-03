@@ -11,24 +11,12 @@ root = true
 
 # File header settings
 [*.cs]
-file_header_template = """
-// <copyright file="{fileName}" owner="Raghu R">
-// Copyright (c) Raghu R. All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-// </copyright>
-"""
+file_header_template = <copyright file="{fileName}" owner="Raghu R">\nCopyright (c) Raghu R. All rights reserved.\nLicensed under the MIT License. See LICENSE file in the project root for full license information.\n</copyright>
 
 [*.cs]
 
 # Default severity for all analyzer diagnostics
 dotnet_analyzer_diagnostic.severity = none
-
-[*.cs]
-file_header_template = """
-// MIT License
-//
-// Copyright (c) 2024 Raghu R
-"""
 
 [*.cs]
 #### Naming styles ####

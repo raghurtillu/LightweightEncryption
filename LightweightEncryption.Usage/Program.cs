@@ -6,6 +6,8 @@
 using System;
 using Azure.Core;
 using Azure.Identity;
+using CommandLine;
+using Dawn;
 using LightweightEncryption.Configuration;
 using LightweightEncryption.KeyVault;
 using Microsoft.Extensions.Configuration;
@@ -28,10 +30,40 @@ namespace LightweightEncryption.Usage
         /// </summary>
         public static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            RunCommand? runCommand = default;
+            var result = Parser.Default.ParseArguments<RunCommand>(args)
+                .WithParsed<RunCommand>(options => runCommand = options)
+                .WithNotParsed<RunCommand>(errors =>
+                {
+                    Console.WriteLine("Errors during argument parsing:");
+                    errors
+                        .ToList()
+                        .ForEach(e => Console.WriteLine(e));
+                });
+
+
             try
             {
-                await CreateHostBuilder();
+                if (result.Errors.Count() > 0)
+                {
+                    Console.WriteLine("Errors during argument parsing. Exiting.");
+                    var errorMessages = result.Errors.Select(e => e.ToString());
+                    var errorMessage = string.Join(Environment.NewLine, errorMessages);
+                    Console.WriteLine("Errors during argument parsing:");
+                    Console.WriteLine(errorMessage);
+
+                    Environment.ExitCode = 1;
+                    return;
+                }
+
+                if (runCommand == default)
+                {
+                    Console.WriteLine("RunCommand is not set. Exiting.");
+                    Environment.ExitCode = 1;
+                    return;
+                }
+
+                await CreateHostBuilder(runCommand);
             }
             catch (Exception ex)
             {
@@ -45,8 +77,9 @@ namespace LightweightEncryption.Usage
         /// <summary>
         /// Create Host Builder.
         /// </summary>
+        /// <param name="runCommand">RunCommand.</param>
         /// <returns>Task.</returns>
-        private static async Task<IHostBuilder> CreateHostBuilder()
+        private static async Task<IHostBuilder> CreateHostBuilder(RunCommand runCommand)
         {
             var configBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -84,11 +117,13 @@ namespace LightweightEncryption.Usage
                     // EncryptorFactory
                     serviceCollection.AddSingleton<IEncryptorFactory, EncryptorFactory>();
 
+                    // RunCommand
+                    serviceCollection.AddSingleton<RunCommand>(runCommand);
+
+                    // Build
                     var serviceProvider = serviceCollection.BuildServiceProvider();
 
-                    var keyVaultConfiguration = serviceProvider.GetRequiredService<IOptions<KeyVaultConfiguration>>();
-                    var keyVaultSecretClientFactory = serviceProvider.GetRequiredService<IKeyVaultSecretClientFactory>();
-                    var encryptorFactory = serviceProvider.GetRequiredService<IEncryptorFactory>();
+                    serviceCollection.AddHostedService<UsageService>();
                 })
                 .UseConsoleLifetime();
 

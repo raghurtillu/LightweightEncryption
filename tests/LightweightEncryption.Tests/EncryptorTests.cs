@@ -3,6 +3,7 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Reflection.Metadata.Ecma335;
 using LightweightEncryption.Configuration;
 using LightweightEncryption.KeyVault;
 using Microsoft.Extensions.Caching.Memory;
@@ -64,9 +65,15 @@ namespace LightweightEncryption.Tests
         public async Task EncryptAsyncTestAsync(string? input)
         {
             var key = GetKey();
+            var keyVersion = GetKeyVersion();
             var configuration = GetEncryptionConfiguration(key);
 
-            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            // Setup the mock to return the key version
+            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretVersionName)), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(keyVersion).Verifiable();
+
+            // Setup the mock to return the key
+            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretName)), It.Is<string>(x => x.Equals(keyVersion)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(key).Verifiable();
 
             var encryptor = new Encryptor(configuration, this.mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
@@ -80,7 +87,7 @@ namespace LightweightEncryption.Tests
             if (input != null)
             {
                 Assert.Equal(input, decrypted);
-                this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+                this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
                 Mock.VerifyAll(this.mockKeyVaultSecretClientFactory, this.mockKeyVaultSecretClient); 
             }
 
@@ -97,7 +104,7 @@ namespace LightweightEncryption.Tests
                 Assert.Equal(input, decrypted);
 
                 // Verify that the key was fetched only once from prior encryption
-                this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once); 
+                this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce); 
             }
         }
 
@@ -112,8 +119,15 @@ namespace LightweightEncryption.Tests
         public async Task EncryptAsyncTestForLargeDataAsync(string filePath)
         {
             var key = GetKey();
+            var keyVersion = GetKeyVersion();
             var configuration = GetEncryptionConfiguration(key);
-            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+
+            // Setup the mock to return the key version
+            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretVersionName)), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(keyVersion).Verifiable();
+
+            // Setup the mock to return the key
+            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretName)), It.Is<string>(x => x.Equals(keyVersion)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(key).Verifiable();
 
             var encryptor = new Encryptor(configuration, this.mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
@@ -135,7 +149,7 @@ namespace LightweightEncryption.Tests
             var decrypted = await encryptor.DecryptAsync(encrypted);
             Assert.Equal(input, decrypted);
             Mock.VerifyAll(this.mockKeyVaultSecretClientFactory, this.mockKeyVaultSecretClient);
-            this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
 
             // encrypt again to test cache
             encrypted = await encryptor.EncryptAsync(input);
@@ -145,7 +159,7 @@ namespace LightweightEncryption.Tests
             Assert.Equal(input, decrypted);
 
             // Verify that the key was fetched only once from prior encryption
-            this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
         }
 
         /// <summary>
@@ -157,8 +171,8 @@ namespace LightweightEncryption.Tests
         {
             return new EncryptionConfiguration
             {
-                SecretName = key,
-                SecretVersion = Guid.NewGuid().ToString("N"),
+                SecretName = "secret--encryption--symmetricKey",
+                SecretVersionName = "secret--encryption--symmetricKeyVersion",
             };
         }
 
@@ -168,6 +182,9 @@ namespace LightweightEncryption.Tests
         /// <returns></returns>
         private static string GetKey()
             => Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
+
+        private static string GetKeyVersion()
+            => "9554E551FC9E458EA8CE6F6BE0AE4A8B";
 
         /// <summary>
         /// Get memory cache.

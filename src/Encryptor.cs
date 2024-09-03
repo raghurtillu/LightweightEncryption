@@ -43,10 +43,11 @@ namespace LightweightEncryption
         private static readonly byte[] Preamble = new byte[4] { (byte)'e', (byte)'n', (byte)'c', (byte)'r' };
         private static readonly UTF8Encoding Utf8Encoder = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
-        private readonly EncryptionConfiguration encryptionConfiguration;
         private readonly IKeyVaultSecretClient keyVaultSecretClient;
         private readonly IMemoryCache memoryCache;
         private readonly TimeSpan cacheExpirationTimeInHours;
+        private readonly string masterKeySecretName;
+        private readonly string masterKeySecretVersionName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Encryptor"/> class.
@@ -59,16 +60,18 @@ namespace LightweightEncryption
             IKeyVaultSecretClientFactory keyVaultSecretClientFactory,
             IMemoryCache memoryCache)
         {
-            this.encryptionConfiguration = Guard.Argument(encryptionConfiguration, nameof(encryptionConfiguration))
+            encryptionConfiguration = Guard.Argument(encryptionConfiguration, nameof(encryptionConfiguration))
                 .NotNull()
                 .Member(i => i.SecretName, s => s.NotNull().NotEmpty())
-                .Member(i => i.SecretVersion, s => s.NotNull().NotEmpty())
+                .Member(i => i.SecretVersionName, s => s.NotNull().NotEmpty())
                 .Value;
 
             keyVaultSecretClientFactory = Guard.Argument(keyVaultSecretClientFactory, nameof(keyVaultSecretClientFactory)).NotNull().Value;
             this.keyVaultSecretClient = keyVaultSecretClientFactory.GetKeyVaultSecretClient();
             this.memoryCache = Guard.Argument(memoryCache, nameof(memoryCache)).NotNull().Value;
             this.cacheExpirationTimeInHours = TimeSpan.FromHours(1);
+            this.masterKeySecretName = encryptionConfiguration.SecretName;
+            this.masterKeySecretVersionName = encryptionConfiguration.SecretVersionName;
         }
 
         /// <inheritdoc />
@@ -79,17 +82,27 @@ namespace LightweightEncryption
                 return input;
             }
 
-            var masterKey = await this.GetMasterKeyForVersionAsync(this.encryptionConfiguration.SecretVersion);
-            if (masterKey == default || masterKey.Length == 0)
+            // Get latest master key secret version
+            var masterKeyVersionAsString = await this.GetSecretAsyncAsString(secretName: this.masterKeySecretVersionName);
+            if (string.IsNullOrEmpty(masterKeyVersionAsString))
             {
-                throw new InvalidOperationException($"Pseudo master key '{this.encryptionConfiguration.SecretName}' for version " +
-                    $"'{this.encryptionConfiguration.SecretVersion}' in keyvault '{this.keyVaultSecretClient.GetKeyVaultName()}' not found or is empty.");
+                throw new InvalidOperationException($"Pseudo master key '{this.masterKeySecretName}' for version " +
+                    $"'{this.masterKeySecretVersionName}' in keyvault '{this.keyVaultSecretClient.GetKeyVaultName()}' not found or is empty.");
             }
 
-            var plainText = Utf8Encoder.GetBytes(input);
-            return Encrypt(plainText, masterKey, new byte[HeaderSize + plainText.Length]);
+            // Get the master key secret
+            var masterKey = await this.GetSecretAsyncAsBytes(secretName: this.masterKeySecretName, secretVersion: masterKeyVersionAsString);
+            if (masterKey == default || masterKey.Length == 0)
+            {
+                throw new InvalidOperationException($"Pseudo master key '{this.masterKeySecretName}' for version " +
+                    $"'{this.masterKeySecretVersionName}' in keyvault '{this.keyVaultSecretClient.GetKeyVaultName()}' not found or is empty.");
+            }
 
-            string Encrypt(ReadOnlySpan<byte> plainText, ReadOnlySpan<byte> masterKey, Span<byte> encryptedData)
+            var masterKeyVersion = Utf8Encoder.GetBytes(masterKeyVersionAsString);
+            var plainText = Utf8Encoder.GetBytes(input);
+            return Encrypt(plainText, masterKey, masterKeyVersion, new byte[HeaderSize + plainText.Length]);
+
+            string Encrypt(ReadOnlySpan<byte> plainText, ReadOnlySpan<byte> masterKey, ReadOnlySpan<byte> masterKeyVersion, Span<byte> encryptedData)
             {
                 var buffer = encryptedData.Slice(0, HeaderSize);
                 var cipherText = encryptedData.Slice(HeaderSize);
@@ -101,12 +114,9 @@ namespace LightweightEncryption
                 var salt = buffer.Slice(SaltOffset, SaltSizeInBytes);
                 RandomNumberGenerator.Fill(salt);
 
-                // Set the masterKeyVersion
-                var masterKeyVersion = buffer.Slice(MasterKeyVersionOffset, MasterKeyVersionSizeInBytes);
-                if (Utf8Encoder.GetBytes(this.encryptionConfiguration.SecretVersion, masterKeyVersion) != MasterKeyVersionSizeInBytes)
-                {
-                    throw new InvalidOperationException($"The masterKeyVersion '{this.encryptionConfiguration.SecretVersion}' is not of expected length '{MasterKeyVersionSizeInBytes}'.");
-                }
+                // Copy master key version
+                var masterKeyVersionSpan = buffer.Slice(MasterKeyVersionOffset, MasterKeyVersionSizeInBytes);
+                masterKeyVersion.CopyTo(masterKeyVersionSpan);
 
                 // Derive a key from the master key and the payload header.
                 Span<byte> derivedKey = stackalloc byte[DerivedKeySizeInBytes];
@@ -141,7 +151,11 @@ namespace LightweightEncryption
                 throw new InvalidOperationException("The encrypted payload has invalid header.");
             }
 
-            var masterKey = await this.GetMasterKeyForVersionAsync(Utf8Encoder.GetString(encryptedData.AsSpan().Slice(MasterKeyVersionOffset, MasterKeyVersionSizeInBytes)));
+            // Copy master key version to a byte array
+            var masterKeyVersionAsBytes = encryptedData.AsSpan().Slice(MasterKeyVersionOffset, MasterKeyVersionSizeInBytes).ToArray();
+            var masterKeyVersionAsString = Utf8Encoder.GetString(encryptedData.AsSpan().Slice(MasterKeyVersionOffset, MasterKeyVersionSizeInBytes));
+
+            var masterKey = await this.GetSecretAsyncAsBytes(secretName: this.masterKeySecretName, secretVersion: masterKeyVersionAsString);
             return Decrypt(encryptedData, masterKey, new byte[encryptedData.Length - HeaderSize]);
 
             string Decrypt(ReadOnlySpan<byte> encryptedData, ReadOnlySpan<byte> masterKey, Span<byte> decryptedData)
@@ -163,23 +177,33 @@ namespace LightweightEncryption
             }
         }
 
-        /// <summary>
-        /// Gets the pseudo master key for the given version.
-        /// </summary>
-        /// <param name="masterKeyVersion">Optional secret version of the secret pseudo master key, if the version is not provided latest version is used.</param>
-        /// <returns></returns>
-        private Task<byte[]?> GetMasterKeyForVersionAsync(string masterKeyVersion)
+        private Task<byte[]?> GetSecretAsyncAsBytes(string secretName, string secretVersion = "")
         {
             return this.memoryCache.GetOrCreateAsync(
-                masterKeyVersion,
+                (secretName, secretVersion),
                 async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = this.cacheExpirationTimeInHours;
+                    var secret = await this.GetSecretAsyncAsString(secretName, secretVersion);
+                    if (string.IsNullOrEmpty(secret))
+                    {
+                        return default;
+                    }
 
-                    var secret = !string.IsNullOrEmpty(masterKeyVersion)
-                                     ? await this.keyVaultSecretClient.GetSecretAsync(this.encryptionConfiguration.SecretName, masterKeyVersion, default)
-                                     : await this.keyVaultSecretClient.GetSecretAsync(this.encryptionConfiguration.SecretName, default);
                     return Convert.FromHexString(secret);
+                });
+        }
+
+        private Task<string?> GetSecretAsyncAsString(string secretName, string secretVersion = "")
+        {
+            return this.memoryCache.GetOrCreateAsync(
+                (secretName, secretVersion),
+                async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = this.cacheExpirationTimeInHours;
+                    return !string.IsNullOrEmpty(secretVersion)
+                        ? await this.keyVaultSecretClient.GetSecretAsync(secretName, secretVersion, default)
+                        : await this.keyVaultSecretClient.GetSecretAsync(secretName, default);
                 });
         }
     }

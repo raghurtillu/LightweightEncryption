@@ -402,3 +402,4 @@ FodyWeavers.xsd
 # local files
 scripts/azure_script/**
 /.vscode
+/LightweightEncryption.Usage/Properties/launchSettings.json

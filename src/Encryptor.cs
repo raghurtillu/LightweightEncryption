@@ -90,7 +90,7 @@ namespace LightweightEncryption
                     $"'{this.masterKeySecretVersionName}' in keyvault '{this.keyVaultSecretClient.GetKeyVaultName()}' not found or is empty.");
             }
 
-            // Get the master key secret
+            // Get the master key secret for specified version
             var masterKey = await this.GetSecretAsyncAsBytes(secretName: this.masterKeySecretName, secretVersion: masterKeyVersionAsString);
             if (masterKey == default || masterKey.Length == 0)
             {
@@ -153,9 +153,13 @@ namespace LightweightEncryption
 
             // Copy master key version to a byte array
             var masterKeyVersionAsBytes = encryptedData.AsSpan().Slice(MasterKeyVersionOffset, MasterKeyVersionSizeInBytes).ToArray();
+
+            // Convert master key version to string
             var masterKeyVersionAsString = Utf8Encoder.GetString(encryptedData.AsSpan().Slice(MasterKeyVersionOffset, MasterKeyVersionSizeInBytes));
 
+            // Get the master key secret for specified version
             var masterKey = await this.GetSecretAsyncAsBytes(secretName: this.masterKeySecretName, secretVersion: masterKeyVersionAsString);
+
             return Decrypt(encryptedData, masterKey, new byte[encryptedData.Length - HeaderSize]);
 
             string Decrypt(ReadOnlySpan<byte> encryptedData, ReadOnlySpan<byte> masterKey, Span<byte> decryptedData)
@@ -177,6 +181,13 @@ namespace LightweightEncryption
             }
         }
 
+        /// <summary>
+        /// Get secret for specified version as a byte array.
+        /// If secret version is empty, then latest version is returned.
+        /// </summary>
+        /// <param name="secretName">secretName.</param>
+        /// <param name="secretVersion">secretVersion.</param>
+        /// <returns>secret.</returns>
         private Task<byte[]?> GetSecretAsyncAsBytes(string secretName, string secretVersion = "")
         {
             return this.memoryCache.GetOrCreateAsync(
@@ -194,8 +205,16 @@ namespace LightweightEncryption
                 });
         }
 
+        /// <summary>
+        /// Get secret for specified version as a string.
+        /// If secret version is empty, then latest version is returned.
+        /// </summary>
+        /// <param name="secretName">secretName.</param>
+        /// <param name="secretVersion">secretVersion.</param>
+        /// <returns>secret.</returns>
         private Task<string?> GetSecretAsyncAsString(string secretName, string secretVersion = "")
         {
+            // cache the secret
             return this.memoryCache.GetOrCreateAsync(
                 (secretName, secretVersion),
                 async entry =>

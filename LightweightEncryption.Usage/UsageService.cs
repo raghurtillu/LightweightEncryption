@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using Dawn;
 using Microsoft.Extensions.Hosting;
 
@@ -33,17 +34,20 @@ namespace LightweightEncryption.Usage
         {
             var command = this.runCommand;
             var encryptor = this.encryptorFactory.GetEncryptor();
+            var stopWatch = Stopwatch.StartNew();
 
             // Perform encryption or decryption based on the operation
             if (command.Operation == Operation.Encrypt)
             {
                 string encryptedText = await encryptor.EncryptAsync(command.Payload);
                 Console.WriteLine($"Encrypted text: {encryptedText}");
+                Console.WriteLine($"Time taken: {stopWatch.ElapsedMilliseconds} ms");
             }
             else if (command.Operation == Operation.Decrypt)
             {
                 string decryptedText = await encryptor.DecryptAsync(command.Payload);
                 Console.WriteLine($"Decrypted text: {decryptedText}");
+                Console.WriteLine($"Time taken: {stopWatch.ElapsedMilliseconds} ms");
             }
             else
             {

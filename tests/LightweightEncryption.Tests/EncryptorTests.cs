@@ -55,6 +55,182 @@ namespace LightweightEncryption.Tests
             };
 
         /// <summary>
+        /// Encryptor constructor tests.
+        /// </summary>
+        [Theory]
+        [Trait("Category", "Unit")]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(true, false, false)]
+        [InlineData(false, true, true)]
+        [InlineData(false, false, true)]
+        [InlineData(false, true, false)]
+        [InlineData(false, true, true)]
+        [InlineData(true, false, false)]
+        [InlineData(true, true, false)]
+        [InlineData(true, true, true)]
+        public void EncryptorConstructorThrowsExceptionWhenInvalidArgumentsPassed(bool isConfigurationNull, bool isKeyVaultSecretFactoryNull, bool isMemoryCacheNull)
+        {
+            // Arrange
+            EncryptionConfiguration? configuration = !isConfigurationNull ? GetEncryptionConfiguration() : default;
+            IKeyVaultSecretClientFactory? secretClientFactory = !isKeyVaultSecretFactoryNull ? this.mockKeyVaultSecretClientFactory.Object : default;
+            IMemoryCache? memoryCache = !isMemoryCacheNull ? GetMemoryCache() : default;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => new Encryptor(configuration, secretClientFactory, memoryCache));
+        }
+
+        /// <summary>
+        /// Encryptor tests when input is null or empty.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task EncryptorDoesNotEncryptWhenInputIsNullOrEmptyAsync()
+        {
+            // Arrange
+            string? input = null;
+            Encryptor encryptor = new Encryptor(GetEncryptionConfiguration(), mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
+
+            // Act
+            string encrypted = await encryptor.EncryptAsync(input);
+
+            // Assert
+            Assert.Null(encrypted);
+
+            input = string.Empty;
+            encrypted = await encryptor.EncryptAsync(input);
+            Assert.Empty(encrypted);
+        }
+
+        /// <summary>
+        /// Decrypt tests when input is null or empty.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task EncryptorDoesNotDecryptWhenInputIsNullOrEmptyAsync()
+        {
+            // Arrange
+            string? input = null;
+            Encryptor encryptor = new Encryptor(GetEncryptionConfiguration(), mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
+            // Act
+            string decrypted = await encryptor.DecryptAsync(input);
+            // Assert
+            Assert.Null(decrypted);
+            input = string.Empty;
+            decrypted = await encryptor.DecryptAsync(input);
+            Assert.Empty(decrypted);
+        }
+
+        /// <summary>
+        /// Encryptor tests when key vault secret client throws exception.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task EncryptorThrowsExceptionWhenKeyVaultSecretClientThrowsExceptionAsync()
+        {
+            // Arrange
+            var key = GetKey();
+            var keyVersion = GetKeyVersion();
+            var configuration = GetEncryptionConfiguration();
+
+            // Setup the mock to throw exception
+            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretVersionName)), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("KeyVaultSecretClient exception")).Verifiable();
+
+            var encryptor = new Encryptor(configuration, this.mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
+
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(() => encryptor.EncryptAsync("Hello World"));
+            Mock.VerifyAll(this.mockKeyVaultSecretClientFactory, this.mockKeyVaultSecretClient);
+        }
+
+        /// <summary>
+        /// Encryptor tests when key vault returns invalid key.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task EncryptorThrowsExceptionWhenKeyVaultReturnsInvalidKeyAsync()
+        {
+            // Arrange
+            var key = GetKey();
+            var keyVersion = GetKeyVersion();
+            var configuration = GetEncryptionConfiguration();
+
+            // Setup the mock to return the key version
+            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretVersionName)), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(keyVersion).Verifiable();
+            // Setup the mock to return the key
+            this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretName)), It.Is<string>(x => x.Equals(keyVersion)), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(string.Empty).Verifiable();
+            var encryptor = new Encryptor(configuration, this.mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() => encryptor.EncryptAsync("Hello World"));
+            Mock.VerifyAll(this.mockKeyVaultSecretClientFactory, this.mockKeyVaultSecretClient);
+        }
+
+        /// <summary>
+        /// Encryptor tests when decryption data format is invalid.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task EncryptorThrowsExceptionWhenDecryptDataFormatIsInvalidAsync()
+        {
+            // Arrange
+            var key = GetKey();
+            var keyVersion = GetKeyVersion();
+            var configuration = GetEncryptionConfiguration();
+
+            var encryptor = new Encryptor(configuration, this.mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
+
+            // Act & Assert
+            await Assert.ThrowsAsync<FormatException>(() => encryptor.DecryptAsync("InvalidData"));
+        }
+
+        /// <summary>
+        /// Encryptor tests when decryption data header size is invalid.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task EncryptorThrowsExceptionWhenDecryptDataHeaderSizeIsInvalidAsync()
+        {
+            // Arrange
+            var key = GetKey();
+            var keyVersion = GetKeyVersion();
+            var configuration = GetEncryptionConfiguration();
+            var encryptor = new Encryptor(configuration, this.mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
+            string? base64String = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("Hello World"));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidDataException>(() => encryptor.DecryptAsync(base64String));
+        }
+
+        /// <summary>
+        /// Encryptor tests when decryption data preamble is invalid.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task EncryptorThrowsExceptionWhenDecryptDataPreambleIsInvalidAsync()
+        {
+            // Arrange
+            var key = GetKey();
+            var keyVersion = GetKeyVersion();
+            var configuration = GetEncryptionConfiguration();
+            var encryptor = new Encryptor(configuration, this.mockKeyVaultSecretClientFactory.Object, GetMemoryCache());
+            string? base64String = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("ZW5jcvLQK/EWcR+z/vB8wUZxUeWyyy6JoKpn1MHL4eT1tqFwOTU1NGU1NTFmYzllNDU4ZWE4Y2U2ZjZiZTBh"));
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() => encryptor.DecryptAsync(base64String));
+        }
+
+        /// <summary>
         /// Encryptor tests for encryption and decryption.
         /// </summary>
         /// <param name="input"></param>
@@ -62,11 +238,11 @@ namespace LightweightEncryption.Tests
         [Theory]
         [MemberData(nameof(EncryptorTestsData))]
         [Trait("Category", "Unit")]
-        public async Task EncryptAsyncTestAsync(string? input)
+        public async Task EncryptorForTestDataSucceedsAsync(string? input)
         {
             var key = GetKey();
             var keyVersion = GetKeyVersion();
-            var configuration = GetEncryptionConfiguration(key);
+            var configuration = GetEncryptionConfiguration();
 
             // Setup the mock to return the key version
             this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretVersionName)), It.IsAny<CancellationToken>()))
@@ -116,11 +292,11 @@ namespace LightweightEncryption.Tests
         [Theory]
         [MemberData(nameof(EncryptorTestsLargeData))]
         [Trait("Category", "Unit")]
-        public async Task EncryptAsyncTestForLargeDataAsync(string filePath)
+        public async Task EncryptorForLargeTestDataSucceedsAsync(string filePath)
         {
             var key = GetKey();
             var keyVersion = GetKeyVersion();
-            var configuration = GetEncryptionConfiguration(key);
+            var configuration = GetEncryptionConfiguration();
 
             // Setup the mock to return the key version
             this.mockKeyVaultSecretClient.Setup(x => x.GetSecretAsync(It.Is<string>(x => x.Equals(configuration.SecretVersionName)), It.IsAny<CancellationToken>()))
@@ -165,9 +341,8 @@ namespace LightweightEncryption.Tests
         /// <summary>
         /// Get encryption configuration.
         /// </summary>
-        /// <param name="key">EncryptionKey.</param>
         /// <returns>EncryptionConfiguration.</returns>
-        private static EncryptionConfiguration GetEncryptionConfiguration(string key)
+        private static EncryptionConfiguration GetEncryptionConfiguration()
         {
             return new EncryptionConfiguration
             {
@@ -179,10 +354,14 @@ namespace LightweightEncryption.Tests
         /// <summary>
         /// Get key.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Key.</returns>
         private static string GetKey()
             => Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
 
+        /// <summary>
+        /// Get key version.
+        /// </summary>
+        /// <returns>Key version.</returns>
         private static string GetKeyVersion()
             => "9554E551FC9E458EA8CE6F6BE0AE4A8B";
 

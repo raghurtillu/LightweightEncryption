@@ -53,6 +53,9 @@ namespace LightweightEncryption.Usage
             {
                 Console.WriteLine("Invalid operation specified.");
             }
+
+            // Exit from the service and stop the app
+            Environment.Exit(0);
         }
     }
 }

@@ -14,7 +14,7 @@ Before you begin, ensure you have met the following requirements:
 
 - You have installed [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
 - You are using Visual Studio 2022 or later.
-- You have an Azure subscription and key vault to store the pseudo master key and master key version.
+- You have an [Azure](https://azure.microsoft.com) subscription and [keyvault](https://azure.microsoft.com/en-us/products/key-vault) to store the pseudo master key and master key version.
 
 ## Using LightweightEncryption
 There are two parts to using LightweightEncryption:
@@ -23,24 +23,41 @@ There are two parts to using LightweightEncryption:
 
 ### Generating pseudo master key and master key version
 
-To generate the pseudo master key and master key version, you can use the `generate_encryptionkeys_azure.py` script located in the `Scripts` folder. This script will create and store the keys in your Azure Key Vault.
+You can use the `generate_encryptionkeys_azure.py` script located in the `Scripts` folder. This script will create and store the keys in your Azure Key Vault.
+This script will generate a 32 byte pseudo master key and the version of the pseudo master key is stored in the master key version name.
 
 #### Steps:
 
-1. **Install the required Python packages**:
+1. **Set up your Azure subscription and keyvault**:
+    - Create a resource group in your Azure subscription.
+    - Create a key vault in your resource group.
+    - Create a service principal with access to the key vault. This service principal could either be your identity or a managed identity.
+    - Assign the service principal the necessary permissions to the key vault.
+    - In particular `Get, List, Set` permissions on secrets are required.
+
+2. **Install the required Python packages**:
    ```python
-   pip install azure-identity azure-keyvault-keys
+   pip install scripts\requirements.txt
    ```
-    
-2. **Set up your Azure credentials**:
-    Ensure you have the necessary environment variables set for Azure authentication. You can use the Azure CLI to log in:
     
 3. **Run the script**:
     Execute the `generate_encryptionkeys_azure.py` script to generate and store the keys:
-    
-#### Script: `generate_encryptionkeys_azure.py`
-
-This script will create an RSA key for both the pseudo master key and the master key version in your Azure Key Vault. It also sets a rotation policy for the pseudo master key to rotate every 90 days.
-
-Now you are ready to use these keys for encryption and decryption operations in your application.
+    - Provide the necessary parameters to the script:
+        - `--subscription-id`: Azure subscription id, this parameter is required.
+        - `--resource-group`: Azure resource group in which the keyvault resides, this parameter is required.
+        - `--location`: Azure region, this parameter is required.
+        - `--vault-name`: Azure keyvault, this parameter is required.
+        - `--key-name`: Optional parameter to save the pseudo master key, if not specified 'secret--encryption--symmetricKey' will be used.
+        - `--key-version-name`: Optional parameter to track the pseudo master key version, if not specified, 'secret--encryption--symmetricKeyVersion' will be used.
+        - `--expiration`: Optional parameter to set the expiration time for the pseudo master key in ISO 8601 format, 'YYYY-MM-DD', if not specified, the key will expire in 3 months from the date of creation.
+        - `--tags`: Optional parameter to set tags for the pseudo master key, if not specified, the current login user name will be used.
+        - `--dry-run`: Optional parameter to run the script in dry run mode, no changes will be applied.
+    ```python
+1. python generate_encryptionkeys_azure.py --subscription-id <subscription-id> --resource-group <resource-group> --location <location> --vault-name <vault-name> --key-name <key-name> --key-version-name <key-version-name> --expiration <expiration> --tags <tags> --dry-run
+    ```
+4. **Verify the keys**:
+    - Go to the Azure portal and navigate to the key vault.
+    - Verify that the pseudo master key and master key version are created.
+5. **Encrypt/Decrypt**
+1. Add the LightweightEncryption NuGet package to your project.
 

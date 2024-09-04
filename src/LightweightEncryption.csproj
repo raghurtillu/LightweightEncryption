@@ -6,6 +6,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>LightweightEncryption</AssemblyName>
     <RootNamespace>LightweightEncryption</RootNamespace>
+    <Authors>Raghu R</Authors>
+    <Company>Microsoft</Company>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.42.0" />
@@ -21,5 +23,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\scripts\*.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>scripts\%(Filename)%(Extension)</TargetPath>
+    </Content>
+    <Content Include="..\scripts\requirements.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>scripts\requirements.txt</TargetPath>
+    </Content>
   </ItemGroup>
 </Project>

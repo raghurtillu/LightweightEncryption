@@ -64,12 +64,12 @@ namespace LightweightEncryption.Usage
         /// Gets or sets the key name.
         /// </summary>
         [Option('k', "key-name", Default = "secret--encryption--symmetricKey", Required = false, HelpText = "Key name.")]
-        public string KeyName { get; set; }
+        required public string KeyName { get; set; }
 
         /// <summary>
         /// Gets or sets the key version name.
         /// </summary>
         [Option('n', "key-version-name", Default = "secret--encryption--symmetricKeyVersion", Required = false, HelpText = "Key version name.")]
-        public string KeyVersionName { get; set; }
+        required public string KeyVersionName { get; set; }
     }
 }

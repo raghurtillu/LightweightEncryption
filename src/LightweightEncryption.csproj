@@ -26,10 +26,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\scripts\*.py">
+      <PackageCopyToOutput>true</PackageCopyToOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <TargetPath>scripts\%(Filename)%(Extension)</TargetPath>
     </Content>
     <Content Include="..\scripts\requirements.txt">
+      <PackageCopyToOutput>true</PackageCopyToOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <TargetPath>scripts\requirements.txt</TargetPath>
     </Content>

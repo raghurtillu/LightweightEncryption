@@ -17,6 +17,10 @@ Before you begin, ensure you have met the following requirements:
 - You have an [Azure](https://azure.microsoft.com) subscription and [keyvault](https://azure.microsoft.com/en-us/products/key-vault) to store the pseudo master key and master key version.
 
 ## Using LightweightEncryption
+One can use this either via nuget or by cloning this repo and taking compile time dependency.
+
+### Using Nuget
+
 There are two parts to using LightweightEncryption:
 1. Generating pseudo master key and master key version.
 2. Using the pseudo master key and master key version to encrypt and decrypt data.
@@ -39,7 +43,7 @@ This script will generate a 32 byte pseudo master key and the version of the pse
    ```python
    pip install scripts\requirements.txt
    ```
-    
+
 3. **Run the script**:
     Execute the `generate_encryptionkeys_azure.py` script to generate and store the keys:
     - Provide the necessary parameters to the script:

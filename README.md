@@ -17,7 +17,19 @@ Before you begin, ensure you have met the following requirements:
 - You have an [Azure](https://azure.microsoft.com) subscription and [keyvault](https://azure.microsoft.com/en-us/products/key-vault) to store the pseudo master key and master key version.
 
 ## Using LightweightEncryption
+
+### via Nuget
+
+This is the easier via to consume this package.
+
+From Visual Studio, open Tools -> NuGet Package Manager -> Manage NuGet Packages for Solution... -> Browse, search for `LightweightEncryption` in `nuget` PackageSource or run `dotnet add package LightweightEncryption --version 1.0.1` from console to appropriate projects in the solution.
+
+Once installed, ensure you `build` the project in which the package was installed, this will create a `scripts` folder in the project, which should be visible in Visual Studio's solution explorer as well.
+
+From the cli navigate to the `scripts` folder generated, this should reside under the project root.
+
 There are two parts to using LightweightEncryption:
+
 1. Generating pseudo master key and master key version.
 2. Using the pseudo master key and master key version to encrypt and decrypt data.
 
@@ -26,7 +38,7 @@ There are two parts to using LightweightEncryption:
 You can use the `generate_encryptionkeys_azure.py` script located in the `Scripts` folder. This script will create and store the keys in your Azure Key Vault.
 This script will generate a 32 byte pseudo master key and the version of the pseudo master key is stored in the master key version name.
 
-#### Steps:
+#### Steps
 
 1. **Set up your Azure subscription and keyvault**:
     - Create a resource group in your Azure subscription.
@@ -39,7 +51,7 @@ This script will generate a 32 byte pseudo master key and the version of the pse
    ```python
    pip install scripts\requirements.txt
    ```
-    
+
 3. **Run the script**:
     Execute the `generate_encryptionkeys_azure.py` script to generate and store the keys:
     - Provide the necessary parameters to the script:

@@ -12,14 +12,14 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>encrypted.png</PackageIcon>
     <PackageIconUrl>https://www.flaticon.com/free-icons/encrypted</PackageIconUrl>
-    <PackageTags>Encryption AES SHA-256</PackageTags>
+    <PackageTags>encryption hashing aes aes256 sha-256 sha256 dataprotection</PackageTags>
     <Description>Lightweight encryption library provides a fast, simple and strong encryption for your data.
      It is based on AES-GCM encryption algorithm and provides support for auto-rotation of encryption keys.
     </Description>
     <Version>1.0.1</Version>
     <Title>LightweightEncryption</Title>
     <RepositoryUrl>https://github.com/raghurtillu/LightweightEncryption.git</RepositoryUrl>
-
+    <PackageProjectUrl>https://github.com/raghurtillu/LightweightEncryption.git</PackageProjectUrl>
         <!--
     // https://github.com/dotnet/sourcelink/blob/master/docs/README.md
     // Starting with .NET Core SDK 2.1.300, a fully deterministic build is
@@ -31,13 +31,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <NuGetAudit>false</NuGetAudit>
-
-    <!--
-    // The NuGet client min required version to use the package.
-    // With NuGet 6.11.0+ and Visual Studio 2022.
-    -->
-    <MinClientVersion>6.11.0</MinClientVersion>
-      
+    <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.42.0" />

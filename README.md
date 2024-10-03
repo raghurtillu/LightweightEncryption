@@ -1,4 +1,5 @@
 # LightweightEncryption
+
 Lightweight encryption library provides a fast, simple and strong encryption for your data.
 It is based on AES-GCM encryption algorithm and provides support for auto-rotation of encryption keys.
 
@@ -17,11 +18,19 @@ Before you begin, ensure you have met the following requirements:
 - You have an [Azure](https://azure.microsoft.com) subscription and [keyvault](https://azure.microsoft.com/en-us/products/key-vault) to store the pseudo master key and master key version.
 
 ## Using LightweightEncryption
-One can use this either via nuget or by cloning this repo and taking compile time dependency.
 
-### Using Nuget
+### via Nuget
+
+This is the easier via to consume this package.
+
+From Visual Studio, open Tools -> NuGet Package Manager -> Manage NuGet Packages for Solution... -> Browse, search for `LightweightEncryption` in `nuget` PackageSource or run `dotnet add package LightweightEncryption --version 1.0.1` from console to appropriate projects in the solution.
+
+Once installed, ensure you `build` the project in which the package was installed, this will create a `scripts` folder in the project, which should be visible in Visual Studio's solution explorer as well.
+
+From the cli navigate to the `scripts` folder generated, this should reside under the project root.
 
 There are two parts to using LightweightEncryption:
+
 1. Generating pseudo master key and master key version.
 2. Using the pseudo master key and master key version to encrypt and decrypt data.
 
@@ -30,7 +39,7 @@ There are two parts to using LightweightEncryption:
 You can use the `generate_encryptionkeys_azure.py` script located in the `Scripts` folder. This script will create and store the keys in your Azure Key Vault.
 This script will generate a 32 byte pseudo master key and the version of the pseudo master key is stored in the master key version name.
 
-#### Steps:
+#### Steps
 
 1. **Set up your Azure subscription and keyvault**:
     - Create a resource group in your Azure subscription.
@@ -40,8 +49,9 @@ This script will generate a 32 byte pseudo master key and the version of the pse
     - In particular `Get, List, Set` permissions on secrets are required.
 
 2. **Install the required Python packages**:
+
    ```python
-   pip install scripts\requirements.txt
+   pip install -r requirements.txt
    ```
 
 3. **Run the script**:
@@ -56,12 +66,13 @@ This script will generate a 32 byte pseudo master key and the version of the pse
         - `--expiration`: Optional parameter to set the expiration time for the pseudo master key in ISO 8601 format, 'YYYY-MM-DD', if not specified, the key will expire in 3 months from the date of creation.
         - `--tags`: Optional parameter to set tags for the pseudo master key, if not specified, the current login user name will be used.
         - `--dry-run`: Optional parameter to run the script in dry run mode, no changes will be applied.
+
     ```python
 1. python generate_encryptionkeys_azure.py --subscription-id <subscription-id> --resource-group <resource-group> --location <location> --vault-name <vault-name> --key-name <key-name> --key-version-name <key-version-name> --expiration <expiration> --tags <tags> --dry-run
+
     ```
 4. **Verify the keys**:
     - Go to the Azure portal and navigate to the key vault.
     - Verify that the pseudo master key and master key version are created.
 5. **Encrypt/Decrypt**
 1. Add the LightweightEncryption NuGet package to your project.
-

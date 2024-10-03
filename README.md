@@ -33,9 +33,8 @@ Before you begin, ensure you have met the following requirements:
 
 ## Using LightweightEncryption
 
-### via Nuget
+### via NuGet
 
-This is the easier via to consume this package.
 [LightweightEncryption NuGet Package](https://www.nuget.org/packages/LightweightEncryption)
 
 Follow the instructions in the link above to install the package in your project.
@@ -137,4 +136,17 @@ string encryptedpayload = await encryptor.EncryptAsync(payload);
 string decryptedpayload = await encryptor.DecryptAsync(encryptedpayload);
 ```
 
-6. Add the LightweightEncryption NuGet package to your project.
+
+### via Git Clone
+
+Clone the repo using git
+```
+git clone https://github.com/raghutillu/LightweightEncryption.git
+```
+After cloning, navigate to `scripts` folder and run the `generate_encryptionkeys_azure.py` script as mentioned in earlier section.
+
+You can either build the `LightweightEncryption` project and take a dependency on `LightweightEncryption` assembly or copy the code into your project and take a compile time dependency instead.
+
+### Contribution
+Feedback is welcome.
+

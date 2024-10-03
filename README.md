@@ -30,13 +30,27 @@ The library generates 84-byte header consisting of
 ```
 
 #### Performance
-Following are the numbers for this library when run on a system with
+
 * OS: Windows 11 Enterprise
 * Processor: Intel64 Family 6 Model 60 Stepping 3 GenuineIntel ~3601 Mhz
 * Processor Architecture: x64
 * Number of Processors: 8
 * RAM: 16 GB
 * Cache: L1 256 KB, L2 1.0 MB, L3 8.0 MB
+
+Amortized results
+```
++----------------+---------------------+---------------------+
+| File size      |  Encryption time    |  Decryption time    |
++----------------+---------------------+---------------------+
+|  128 kb        |  0.659 msec         |  0.678 msec         |
++----------------+---------------------+---------------------+
+|  256 kb        |  0.875 msec         |  0.896 msec         |
++----------------+---------------------+---------------------+
+|  512 kb        |  1.207 msec         |  1.299 msec         |
++----------------+---------------------+---------------------+
+```
+
 
 ## Prerequisites
 

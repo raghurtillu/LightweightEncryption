@@ -9,6 +9,20 @@ This library uses a pseudo master key to derive encryption keys dynamically at r
 
 There is a master key version that keeps track of the master key to allow for auto-rotation of encryption keys.
 
+The library generates 84-byte header consisting of
+* A 4-byte preamble, a magic value to determine if the payload is encrypted.
+* A 32-byte salt, of which the first 12 bytes are used as Nonce.
+* A 32-byte pseudo master key version.
+* A 16-byte tag.
+
+```
++----------+-----------------------------+-----------------------------+--------------+---------------------------
+| Preamble |  Salt                       |  Pseudo master key version  |  Tag         |  Variable length payload |
++----------+-----------------------------+-----------------------------+--------------+---------------------------
+|  4       |  32 (first 12 bytes Nonce)  |  32                         |  16          |       0 - n bytes        |
++----------+-----------------------------+-----------------------------+--------------+---------------------------
+```
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
@@ -22,12 +36,10 @@ Before you begin, ensure you have met the following requirements:
 ### via Nuget
 
 This is the easier via to consume this package.
+[LightweightEncryption NuGet Package](https://www.nuget.org/packages/LightweightEncryption)
 
-From Visual Studio, open Tools -> NuGet Package Manager -> Manage NuGet Packages for Solution... -> Browse, search for `LightweightEncryption` in `nuget` PackageSource or run `dotnet add package LightweightEncryption --version 1.0.1` from console to appropriate projects in the solution.
-
+Follow the instructions in the link above to install the package in your project.
 Once installed, ensure you `build` the project in which the package was installed, this will create a `scripts` folder in the project, which should be visible in Visual Studio's solution explorer as well.
-
-From the cli navigate to the `scripts` folder generated, this should reside under the project root.
 
 There are two parts to using LightweightEncryption:
 
@@ -36,7 +48,9 @@ There are two parts to using LightweightEncryption:
 
 ### Generating pseudo master key and master key version
 
-You can use the `generate_encryptionkeys_azure.py` script located in the `Scripts` folder. This script will create and store the keys in your Azure Key Vault.
+Open command line terminal and navigate to `scripts` folder generated from earlier step.
+
+Use the script `generate_encryptionkeys_azure.py` to create and store the keys in your Azure Key Vault.
 This script will generate a 32 byte pseudo master key and the version of the pseudo master key is stored in the master key version name.
 
 #### Steps
@@ -68,11 +82,59 @@ This script will generate a 32 byte pseudo master key and the version of the pse
         - `--dry-run`: Optional parameter to run the script in dry run mode, no changes will be applied.
 
     ```python
-1. python generate_encryptionkeys_azure.py --subscription-id <subscription-id> --resource-group <resource-group> --location <location> --vault-name <vault-name> --key-name <key-name> --key-version-name <key-version-name> --expiration <expiration> --tags <tags> --dry-run
-
+    python generate_encryptionkeys_azure.py --subscription-id <subscription-id> --resource-group <resource-group> --location <location> --vault-name <vault-name> --key-name <key-name> --key-version-name <key-version-name> --expiration <expiration> --tags <tags> --dry-run
     ```
 4. **Verify the keys**:
     - Go to the Azure portal and navigate to the key vault.
     - Verify that the pseudo master key and master key version are created.
-5. **Encrypt/Decrypt**
-1. Add the LightweightEncryption NuGet package to your project.
+5. **Using encryption library**
+   - A sample project `LightweightEncryption.Usage` in this repo shows the usage of the encryption library.
+
+###### Dependency injection
+```C#
+using LightweightEncryption;
+...
+
+// Inject LightweightEncryption.IEncryptorFactory;
+var hostBuilder = new HostBuilder()
+  .ConfigureServices((hostBuilderContext, serviceCollection) =>
+  {
+    ...
+    // Configuration
+    serviceCollection.Configure<EncryptionConfiguration>(configurationRoot.GetSection(nameof(EncryptionConfiguration)));
+    serviceCollection.Configure<KeyVaultConfiguration>(configurationRoot.GetSection(nameof(KeyVaultConfiguration)));
+
+    // TokenCredential
+    serviceCollection.AddTransient<TokenCredential>(_ => GetTokenCredential());
+
+    // KeyVault
+    serviceCollection.AddTransient<IKeyVaultSecretClientFactory, KeyVaultSecretClientFactory>();
+
+    // MemoryCache
+    serviceCollection.AddMemoryCache();
+
+    // EncryptorFactory
+    serviceCollection.AddSingleton<IEncryptorFactory, EncryptorFactory>();
+
+    // Build
+    var serviceProvider = serviceCollection.BuildServiceProvider();
+    ...
+  })
+```
+###### Encrypt/Decrypt
+```C#
+using LightweightEncryption;
+...
+
+private readonly IEncryptorFactory encryptorFactory;
+
+// encrypt
+var encryptor = encryptorFactory.GetEncryptor();
+string payload = "...";
+string encryptedpayload = await encryptor.EncryptAsync(payload);
+...
+// decrypt
+string decryptedpayload = await encryptor.DecryptAsync(encryptedpayload);
+```
+
+6. Add the LightweightEncryption NuGet package to your project.

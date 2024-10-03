@@ -14,11 +14,13 @@
     <PackageIconUrl>https://www.flaticon.com/free-icons/encrypted</PackageIconUrl>
     <PackageTags>Encryption AES SHA-256</PackageTags>
     <Description>Lightweight encryption library provides a fast, simple and strong encryption for your data.
-     It is based on AES-GCM encryption algorithm and provides support for auto-rotation of encryption keys.</Description>
+     It is based on AES-GCM encryption algorithm and provides support for auto-rotation of encryption keys.
+    </Description>
     <Version>1.0.1</Version>
     <Title>LightweightEncryption</Title>
-      
-    <!--
+    <RepositoryUrl>https://github.com/raghurtillu/LightweightEncryption.git</RepositoryUrl>
+
+        <!--
     // https://github.com/dotnet/sourcelink/blob/master/docs/README.md
     // Starting with .NET Core SDK 2.1.300, a fully deterministic build is
     // turned on when both Deterministic and ContinuousIntegrationBuild properties are set to true.
@@ -101,7 +103,6 @@
     <None Include="..\Images\encrypted.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Scripts\" />
     <Folder Include="Scripts\" />
   </ItemGroup>
 </Project>

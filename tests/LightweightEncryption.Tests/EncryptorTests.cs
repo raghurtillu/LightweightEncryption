@@ -328,19 +328,12 @@ namespace LightweightEncryption.Tests
             Mock.VerifyAll(this.mockKeyVaultSecretClientFactory, this.mockKeyVaultSecretClient);
             this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
 
-            var encryptStopWatch = Stopwatch.StartNew();
             // encrypt again to test cache
             encrypted = await encryptor.EncryptAsync(input);
-            encryptStopWatch.Stop();
             Assert.NotEqual(input, encrypted);
 
-            var decryptStopWatch = Stopwatch.StartNew();
             decrypted = await encryptor.DecryptAsync(encrypted);
-            decryptStopWatch.Stop();
             Assert.Equal(input, decrypted);
-
-            var encryptTime = encryptStopWatch.ElapsedMilliseconds;
-            var decryptTime = decryptStopWatch.ElapsedMilliseconds;
 
             // Verify that the key was fetched only once from prior encryption
             this.mockKeyVaultSecretClient.Verify(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);

@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>LightweightEncryption.Usage</AssemblyName>
     <RootNamespace>LightweightEncryption.Usage</RootNamespace>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />

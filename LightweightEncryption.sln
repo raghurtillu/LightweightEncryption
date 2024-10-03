@@ -16,6 +16,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightweightEncryption.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightweightEncryption.Usage", "LightweightEncryption.Usage\LightweightEncryption.Usage.csproj", "{47F1B5D0-A900-499A-85FA-7814583F7369}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{99C7A6D3-7595-4F4C-91C7-F6C3AFCD2BB6}"
+	ProjectSection(SolutionItems) = preProject
+		Images\encrypted.png = Images\encrypted.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +42,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{99C7A6D3-7595-4F4C-91C7-F6C3AFCD2BB6} = {A4D3A04B-469D-4B60-92D3-BB2F960E29B4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D1842AD8-E007-4C34-8CE4-96C4652FAB18}

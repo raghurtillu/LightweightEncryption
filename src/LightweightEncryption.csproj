@@ -8,6 +8,27 @@
     <RootNamespace>LightweightEncryption</RootNamespace>
     <Authors>Raghu R</Authors>
     <Company>Microsoft</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>encrypted.png</PackageIcon>
+    <PackageIconUrl>https://www.flaticon.com/free-icons/encrypted</PackageIconUrl>
+    <PackageTags>Encryption AES SHA-256</PackageTags>
+    <Description>Lightweight encryption library provides a fast, simple and strong encryption for your data.
+     It is based on AES-GCM encryption algorithm and provides support for auto-rotation of encryption keys.</Description>
+    <Version>1.0.1</Version>
+    <Title>LightweightEncryption</Title>
+
+    <!--
+    // https://github.com/dotnet/sourcelink/blob/master/docs/README.md
+    // Starting with .NET Core SDK 2.1.300, a fully deterministic build is
+    // turned on when both Deterministic and ContinuousIntegrationBuild properties are set to true.
+    -->  
+    <Deterministic>true</Deterministic>
+
+    <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.42.0" />
@@ -24,15 +45,52 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup Label="FilesToCopy">
+    <Content Include="LightweightEncryption.targets">
+      <Pack>true</Pack>
+      <PackagePath>build/LightweightEncryption.targets</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <BuildAction>None</BuildAction>
+    </Content>
+    <Content Remove="..\scripts\azure_helpers.py" />
+    <None Include="..\scripts\azure_helpers.py">
+      <Pack>true</Pack>
+      <PackagePath>scripts/azure_helpers.py</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <BuildAction>None</BuildAction>
+    </None>
+    <Content Remove="..\scripts\custom_exceptions.py" />
+    <None Include="..\scripts\custom_exceptions.py">
+      <Pack>true</Pack>
+      <PackagePath>scripts/custom_exceptions.py</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <BuildAction>None</BuildAction>
+    </None>
+    <Content Remove="..\scripts\generate_encryptionkeys_azure.py" />
+    <None Include="..\scripts\generate_encryptionkeys_azure.py">
+      <Pack>true</Pack>
+      <PackagePath>scripts/generate_encryptionkeys_azure.py</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <BuildAction>None</BuildAction>
+    </None>
+    <Content Remove="..\scripts\logger.py" />
+    <None Include="..\scripts\logger.py">
+      <Pack>true</Pack>
+      <PackagePath>scripts/logger.py</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <BuildAction>None</BuildAction>
+    </None>
+    <Content Remove="..\scripts\requirements.txt" />
+    <None Include="..\scripts\requirements.txt">
+      <Pack>true</Pack>
+      <PackagePath>scripts/requirements.txt</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <BuildAction>None</BuildAction>
+    </None>
+  </ItemGroup>
   <ItemGroup>
-    <Content Include="..\scripts\*.py">
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\scripts\requirements.txt">
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <TargetPath>scripts\requirements.txt</TargetPath>
-    </Content>
+    <None Include="..\README.md" Pack="true" PackagePath="" Visible="false" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="" Visible="false" />
+    <None Include="..\Images\encrypted.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
 </Project>

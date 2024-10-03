@@ -1,0 +1,8 @@
+<Project>
+  <ItemGroup>
+    <Files Include="$(MSBuildThisFileDirectory)..\scripts\*.*" />
+  </ItemGroup>
+  <Target Name="CopyScripts" BeforeTargets="Build">
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(MSBuildProjectDirectory)\scripts\%(RecursiveDir)" />
+  </Target>
+</Project>

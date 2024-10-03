@@ -1,0 +1,21 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/Settings/stylecop.schema.json",
+    "settings": {
+        "orderingRules": {
+            "usingDirectivesPlacement": "outsideNamespace"
+        },
+        "documentationRules": {
+            "companyName": "Raghu R",
+            "copyrightText": "Copyright (c) Raghu R. All rights reserved.",
+            "headerDecoration": "Licensed under the MIT License. See LICENSE file in the project root for full license information."
+        }
+    },
+    "exclude": [
+        "**/bin",
+        "**/bower_components",
+        "**/jspm_packages",
+        "**/node_modules",
+        "**/obj",
+        "**/platforms"
+    ]
+}

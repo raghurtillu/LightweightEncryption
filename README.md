@@ -1,7 +1,13 @@
 # LightweightEncryption
 
 Lightweight encryption library provides a fast, simple and strong encryption for your data.
-It is based on AES-GCM encryption algorithm and provides support for auto-rotation of encryption keys.
+
+[![dotnet 8.0](https://img.shields.io/badge/dotnet-8.0-green)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+[![python](https://img.shields.io/badge/python-3.12-purple)](https://www.python.org/downloads/release/python-3120/)
+[![Nuget](https://img.shields.io/nuget/v/LightweightEncryption)](https://www.nuget.org/packages/LightweightEncryption)
+
+## Overview
+Lightweight encryption library is based on AES-GCM encryption algorithm and provides support for auto-rotation of encryption keys.
 
 A use case for this library is to encrypt <b>P</b>ersonally <b>I</b>dentifiable <b>I</b>nformation (PII) HTTP request/response in a web server to a LogStore or a Database.
 
@@ -22,6 +28,15 @@ The library generates 84-byte header consisting of
 |  4       |  32                 |  32                         |  16       |  0 - n bytes       |
 +----------+---------------------+-----------------------------+-----------+--------------------+
 ```
+
+#### Performance
+Following are the numbers for this library when run on a system with
+* OS: Windows 11 Enterprise
+* Processor: Intel64 Family 6 Model 60 Stepping 3 GenuineIntel ~3601 Mhz
+* Processor Architecture: x64
+* Number of Processors: 8
+* RAM: 16 GB
+* Cache: L1 256 KB, L2 1.0 MB, L3 8.0 MB
 
 ## Prerequisites
 

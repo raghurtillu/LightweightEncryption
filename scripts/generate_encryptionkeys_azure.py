@@ -79,14 +79,14 @@ def generate_encryption_keys(args: Any) -> None:
     logger.info("Generating encryption key and encryption key version...")
     key = secrets.token_hex(DEFAULT_ENCRYPTION_KEY_LEN)
 
-    if dry_run:
+    if dry_run.lower() in ['true', 't', 'yes', 'y']:
         logger.info("Dry run mode, no changes will be made.")
         logger.info(f"Encryption key '{key_name}' will be created with a value of '{key}'.")
         return
 
     # Set the subscription
     select_subscription(subscription_id)
-    
+
     # Check if the resource group exists
     if not group_exists(resource_group):
         log_error_and_exit("Resource group '{}' does not exist".format(resource_group))
@@ -97,8 +97,8 @@ def generate_encryption_keys(args: Any) -> None:
 
     # set the encryption key
     key_id = set_secret_and_get_secret_version(vault_name, key_name, key, "application/octet-stream", expiration, tags)
-    
-    # set the encryption key version with the encryption key version        
+
+    # set the encryption key version with the encryption key version
     key_version_id = set_secret_and_get_secret_version(vault_name, key_version_name, key_id, "application/octet-stream", expiration, tags)
 
     logger.info(f"Encryption key '{key_name}' and Encryption key version name '{key_version_name}' generated successfully.")

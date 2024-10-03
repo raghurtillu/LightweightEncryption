@@ -1,4 +1,5 @@
 # LightweightEncryption
+
 Lightweight encryption library provides a fast, simple and strong encryption for your data.
 It is based on AES-GCM encryption algorithm and provides support for auto-rotation of encryption keys.
 
@@ -48,8 +49,9 @@ This script will generate a 32 byte pseudo master key and the version of the pse
     - In particular `Get, List, Set` permissions on secrets are required.
 
 2. **Install the required Python packages**:
+
    ```python
-   pip install scripts\requirements.txt
+   pip install -r requirements.txt
    ```
 
 3. **Run the script**:
@@ -64,12 +66,13 @@ This script will generate a 32 byte pseudo master key and the version of the pse
         - `--expiration`: Optional parameter to set the expiration time for the pseudo master key in ISO 8601 format, 'YYYY-MM-DD', if not specified, the key will expire in 3 months from the date of creation.
         - `--tags`: Optional parameter to set tags for the pseudo master key, if not specified, the current login user name will be used.
         - `--dry-run`: Optional parameter to run the script in dry run mode, no changes will be applied.
+
     ```python
 1. python generate_encryptionkeys_azure.py --subscription-id <subscription-id> --resource-group <resource-group> --location <location> --vault-name <vault-name> --key-name <key-name> --key-version-name <key-version-name> --expiration <expiration> --tags <tags> --dry-run
+
     ```
 4. **Verify the keys**:
     - Go to the Azure portal and navigate to the key vault.
     - Verify that the pseudo master key and master key version are created.
 5. **Encrypt/Decrypt**
 1. Add the LightweightEncryption NuGet package to your project.
-

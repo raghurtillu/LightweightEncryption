@@ -53,14 +53,14 @@
       <BuildAction>None</BuildAction>
     </Content>
     <Content Remove="..\scripts\azure_helpers.py" />
-    <None Include="..\scripts\azure_helpers.py">
+    <None Include="..\scripts\azure_helpers.py" Link="Scripts\azure_helpers.py">
       <Pack>true</Pack>
       <PackagePath>scripts/azure_helpers.py</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <BuildAction>None</BuildAction>
     </None>
     <Content Remove="..\scripts\custom_exceptions.py" />
-    <None Include="..\scripts\custom_exceptions.py">
+    <None Include="..\scripts\custom_exceptions.py" Link="Scripts\custom_exceptions.py">
       <Pack>true</Pack>
       <PackagePath>scripts/custom_exceptions.py</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
@@ -74,14 +74,14 @@
       <BuildAction>None</BuildAction>
     </None>
     <Content Remove="..\scripts\logger.py" />
-    <None Include="..\scripts\logger.py">
+    <None Include="..\scripts\logger.py" Link="Scripts\logger.py">
       <Pack>true</Pack>
       <PackagePath>scripts/logger.py</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <BuildAction>None</BuildAction>
     </None>
     <Content Remove="..\scripts\requirements.txt" />
-    <None Include="..\scripts\requirements.txt">
+    <None Include="..\scripts\requirements.txt" Link="Scripts\requirements.txt">
       <Pack>true</Pack>
       <PackagePath>scripts/requirements.txt</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
@@ -92,5 +92,8 @@
     <None Include="..\README.md" Pack="true" PackagePath="" Visible="false" />
     <None Include="..\LICENSE" Pack="true" PackagePath="" Visible="false" />
     <None Include="..\Images\encrypted.png" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\" />
   </ItemGroup>
 </Project>
